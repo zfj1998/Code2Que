@@ -12,8 +12,10 @@ from random import shuffle
 class BatchData:
     def __init__(self, flist, modules, consts, options):
         self.batch_size = len(flist) 
+        # 比如有99条训练数据，那么x就是一段代码，最长为129
         self.x = np.zeros((consts["len_x"], self.batch_size), dtype = np.int64)
         self.x_ext = np.zeros((consts["len_x"], self.batch_size), dtype = np.int64)
+        # y是代码的描述，最长为65
         self.y = np.zeros((consts["len_y"], self.batch_size), dtype = np.int64)
         self.y_ext = np.zeros((consts["len_y"], self.batch_size), dtype = np.int64)
         self.x_mask = np.zeros((consts["len_x"], self.batch_size, 1), dtype = np.int64)
@@ -25,6 +27,7 @@ class BatchData:
         self.x_ext_words = []
         self.max_ext_len = 0
 
+        # 下面两个字典用来把单个字符转换为整数
         w2i = modules["w2i"]
         i2w = modules["i2w"]
         dict_size = len(w2i)
@@ -35,7 +38,7 @@ class BatchData:
             else:
                 print ("ERROR!")
                 return
-            
+            # content和summary表示已经分词过的数组
             content, original_content = contents
             summary, original_summary = summarys
             self.original_contents.append(original_content)
@@ -45,8 +48,8 @@ class BatchData:
                     # some sentences in duc is longer than len_x
                     if idx_word == consts["len_x"]:
                         break
-                    w = content[idx_word]
-                    
+                    w = content[idx_word] # w就是分词后的一个词
+                     
                     if w not in w2i: # OOV
                         if w not in xi_oovs:
                             xi_oovs.append(w)

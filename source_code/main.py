@@ -545,6 +545,9 @@ def run(existing_model_name = None):
                 epoch_start = time.time()
                 partial_start = time.time()
                 # shuffle the trainset
+                '''
+                batch_list: 由多个batch组成的二维列表。每个batch是一个整数，代指原始数据列表的index
+                '''
                 batch_list, num_files, num_batches = datar.batched(len(xy_list), options, consts)
                 used_batch = 0.
                 for idx_batch in range(num_batches):
