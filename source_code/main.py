@@ -48,9 +48,9 @@ def print_basic_info(modules, consts, options):
         logging.info("<eos> IS OMITTED IN TESTING DATA")
     if options["prediction_bytes_limitation"]:
         logging.info("MAXIMUM BYTES IN PREDICTION IS LIMITED")
-    logging.info("RNN TYPE: " + options["cell"])
+    logging.info("RNN TYPE: {}".format(options["cell"]))
     for k in consts:
-        logging.info(k + ":", consts[k])
+        logging.info("{} : {}".format(k, consts[k]))
 
 def init_modules():
     
@@ -227,7 +227,7 @@ def greedy_decode(flist, batch, model, modules, consts, options):
                     dec_words.append(oovs[e - len(modules["i2w"])])
             write_for_rouge(fname, ref_sents[idx_doc], dec_words, cfg)
         else:
-            logging.info("ERROR: " + fname)
+            logging.info(f"ERROR: {fname}")
 
 
 def beam_decode(fname, batch, model, modules, consts, options):
@@ -445,7 +445,7 @@ def predict(model, modules, consts, options):
         xy_list = pickle.load(open(cfg.cc.TESTING_DATA_PATH + "test.pkl", "rb")) 
     batch_list, num_files, num_batches = datar.batched(len(xy_list), options, consts)
 
-    logging.info("num_files = ", num_files, ", num_batches = ", num_batches)
+    logging.info(f"num_files = {num_files} , num_batches = {num_batches}")
     
     running_start = time.time()
     partial_num = 0
@@ -491,9 +491,9 @@ def predict(model, modules, consts, options):
         partial_num += testing_batch_size
         total_num += testing_batch_size
         if partial_num >= consts["testing_print_size"]:
-            logging.info(total_num, "summs are generated")
+            logging.info(f"{total_num} summs are generated")
             partial_num = 0
-    logging.info (si, total_num)
+    logging.info (f"{si}, {total_num}")
 
 def run(existing_model_name = None):
     modules, consts, options = init_modules()
@@ -517,7 +517,7 @@ def run(existing_model_name = None):
         else:
             xy_list = pickle.load(open(cfg.cc.TRAINING_DATA_PATH + "train.pkl", "rb")) 
         batch_list, num_files, num_batches = datar.batched(len(xy_list), options, consts)
-        logging.info ("num_files = ", num_files, ", num_batches = ", num_batches)
+        logging.info (f"num_files = {num_files}, num_batches = {num_batches}")
 
     running_start = time.time()
     if True: #TODO: refactor
@@ -532,7 +532,7 @@ def run(existing_model_name = None):
         if need_load_model:
             if existing_model_name == None:
                 existing_model_name = "cnndm.s2s.gpu4.epoch7.1"
-            logging.info ("loading existed model:", existing_model_name)
+            logging.info (f"loading existed model: {existing_model_name}")
             model, optimizer = load_model(cfg.cc.MODEL_PATH + existing_model_name, model, optimizer)
 
         if training_model:
@@ -540,9 +540,9 @@ def run(existing_model_name = None):
             print_size = num_files // consts["print_time"] if num_files >= consts["print_time"] else num_files
 
             last_total_error = float("inf")
-            logging.info ("max epoch:", consts["max_epoch"])
+            logging.info ("max epoch: {}".format(consts["max_epoch"]))
             for epoch in range(0, consts["max_epoch"]):
-                logging.info ("epoch: ", epoch + existing_epoch)
+                logging.info ("epoch: {}".format(epoch+existing_epoch))
                 num_partial = 1
                 total_error = 0.0
                 error_c = 0.0
@@ -589,19 +589,14 @@ def run(existing_model_name = None):
                     used_batch += 1
                     partial_num_files += consts["batch_size"]
                     if partial_num_files // print_size == 1 and idx_batch < num_batches:
-                        logging.info (idx_batch + 1, "/" , num_batches, "batches have been processed,", \
-                                "average cost until now:", "cost =", total_error / used_batch, ",", \
-                                "cost_c =", error_c / used_batch, ",", \
-                                "time:", time.time() - partial_start)
+                        logging.info ("{} / {} batches have been processed, average cost until now: cost = {}, cost_c = {}, time: {}".format(idx_batch + 1, num_batches, total_error / used_batch, error_c / used_batch, time.time() - partial_start))
                         partial_num_files = 0
                         if not options["is_debugging"]:
                             logging.info("save model... ",)
                             save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
                             logging.info("finished")
                         num_partial += 1
-                logging.info ("in this epoch, total average cost =", total_error / used_batch, ",", \
-                        "cost_c =", error_c / used_batch, ",",\
-                        "time:", time.time() - epoch_start)
+                logging.info ("in this epoch, total average cost = {} cost_c = {} time: {}".format(total_error / used_batch, error_c / used_batch, time.time() - epoch_start))
                 
                 if (epoch + existing_epoch) % consts["golden_truth"] == 0: #每十个epoch进行一次golden test
                     print_sent_dec(y_pred, y_ext, y_mask, oovs, modules, consts, options, local_batch_size)
@@ -624,7 +619,7 @@ def run(existing_model_name = None):
 
         if predict_model:
             predict(model, modules, consts, options)
-    logging.info ("Finished, time:", time.time() - running_start)
+    logging.info ("Finished, time: {}".format( time.time() - running_start))
 
 if __name__ == "__main__":
     np.set_printoptions(threshold = np.inf)
