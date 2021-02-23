@@ -11,6 +11,7 @@ import copy
 import random
 from random import shuffle
 import math
+import logging
 
 import torch
 import torch.nn as nn
@@ -25,28 +26,31 @@ cfg = DeepmindConfigs()
 TRAINING_DATASET_CLS = DeepmindTraining
 TESTING_DATASET_CLS = DeepmindTesting
 
+file = open("training.log", encoding="utf-8", mode="a")
+logging.basicConfig(stream=file, level=logging.INFO)
+
 def print_basic_info(modules, consts, options):
     if options["is_debugging"]:
-        print("\nWARNING: IN DEBUGGING MODE\n")
+        logging.info("\nWARNING: IN DEBUGGING MODE\n")
     if options["copy"]:
-        print("USE COPY MECHANISM")
+        logging.info("USE COPY MECHANISM")
     if options["coverage"]:
-        print("USE COVERAGE MECHANISM")
+        logging.info("USE COVERAGE MECHANISM")
     if  options["avg_nll"]:
-        print("USE AVG NLL as LOSS")
+        logging.info("USE AVG NLL as LOSS")
     else:
-        print("USE NLL as LOSS")
+        logging.info("USE NLL as LOSS")
     if options["has_learnable_w2v"]:
-        print("USE LEARNABLE W2V EMBEDDING")
+        logging.info("USE LEARNABLE W2V EMBEDDING")
     if options["is_bidirectional"]:
-        print("USE BI-DIRECTIONAL RNN")
+        logging.info("USE BI-DIRECTIONAL RNN")
     if options["omit_eos"]:
-        print("<eos> IS OMITTED IN TESTING DATA")
+        logging.info("<eos> IS OMITTED IN TESTING DATA")
     if options["prediction_bytes_limitation"]:
-        print("MAXIMUM BYTES IN PREDICTION IS LIMITED")
-    print("RNN TYPE: " + options["cell"])
+        logging.info("MAXIMUM BYTES IN PREDICTION IS LIMITED")
+    logging.info("RNN TYPE: " + options["cell"])
     for k in consts:
-        print(k + ":", consts[k])
+        logging.info(k + ":", consts[k])
 
 def init_modules():
     
@@ -223,7 +227,7 @@ def greedy_decode(flist, batch, model, modules, consts, options):
                     dec_words.append(oovs[e - len(modules["i2w"])])
             write_for_rouge(fname, ref_sents[idx_doc], dec_words, cfg)
         else:
-            print("ERROR: " + fname)
+            logging.info("ERROR: " + fname)
 
 
 def beam_decode(fname, batch, model, modules, consts, options):
@@ -423,25 +427,25 @@ def beam_decode(fname, batch, model, modules, consts, options):
 
 
 def predict(model, modules, consts, options):
-    print("start predicting,")
+    logging.info("start predicting,")
     options["has_y"] = TESTING_DATASET_CLS.HAS_Y
     if options["beam_decoding"]:
-        print("using beam search")
+        logging.info("using beam search")
     else:
-        print("using greedy search")
+        logging.info("using greedy search")
     rebuild_dir(cfg.cc.BEAM_SUMM_PATH)
     rebuild_dir(cfg.cc.BEAM_GT_PATH)
     rebuild_dir(cfg.cc.GROUND_TRUTH_PATH)
     rebuild_dir(cfg.cc.SUMM_PATH)
 
-    print("loading test set...")
+    logging.info("loading test set...")
     if options["model_selection"]:
         xy_list = pickle.load(open(cfg.cc.VALIDATE_DATA_PATH + "pj1000.pkl", "rb")) 
     else:
         xy_list = pickle.load(open(cfg.cc.TESTING_DATA_PATH + "test.pkl", "rb")) 
     batch_list, num_files, num_batches = datar.batched(len(xy_list), options, consts)
 
-    print("num_files = ", num_files, ", num_batches = ", num_batches)
+    logging.info("num_files = ", num_files, ", num_batches = ", num_batches)
     
     running_start = time.time()
     partial_num = 0
@@ -487,9 +491,9 @@ def predict(model, modules, consts, options):
         partial_num += testing_batch_size
         total_num += testing_batch_size
         if partial_num >= consts["testing_print_size"]:
-            print(total_num, "summs are generated")
+            logging.info(total_num, "summs are generated")
             partial_num = 0
-    print (si, total_num)
+    logging.info (si, total_num)
 
 def run(existing_model_name = None):
     modules, consts, options = init_modules()
@@ -507,17 +511,17 @@ def run(existing_model_name = None):
     print_basic_info(modules, consts, options)
 
     if training_model:
-        print ("loading train set...")
+        logging.info ("loading train set...")
         if options["is_debugging"]:
             xy_list = pickle.load(open(cfg.cc.VALIDATE_DATA_PATH + "pj1000.pkl", "rb")) 
         else:
             xy_list = pickle.load(open(cfg.cc.TRAINING_DATA_PATH + "train.pkl", "rb")) 
         batch_list, num_files, num_batches = datar.batched(len(xy_list), options, consts)
-        print ("num_files = ", num_files, ", num_batches = ", num_batches)
+        logging.info ("num_files = ", num_files, ", num_batches = ", num_batches)
 
     running_start = time.time()
     if True: #TODO: refactor
-        print ("compiling model ..." )
+        logging.info ("compiling model ..." )
         model = Model(modules, consts, options)
         if options["cuda"]:
             model.cuda()
@@ -528,17 +532,17 @@ def run(existing_model_name = None):
         if need_load_model:
             if existing_model_name == None:
                 existing_model_name = "cnndm.s2s.gpu4.epoch7.1"
-            print ("loading existed model:", existing_model_name)
+            logging.info ("loading existed model:", existing_model_name)
             model, optimizer = load_model(cfg.cc.MODEL_PATH + existing_model_name, model, optimizer)
 
         if training_model:
-            print ("start training model ")
+            logging.info ("start training model ")
             print_size = num_files // consts["print_time"] if num_files >= consts["print_time"] else num_files
 
             last_total_error = float("inf")
-            print ("max epoch:", consts["max_epoch"])
+            logging.info ("max epoch:", consts["max_epoch"])
             for epoch in range(0, consts["max_epoch"]):
-                print ("epoch: ", epoch + existing_epoch)
+                logging.info ("epoch: ", epoch + existing_epoch)
                 num_partial = 1
                 total_error = 0.0
                 error_c = 0.0
@@ -585,17 +589,17 @@ def run(existing_model_name = None):
                     used_batch += 1
                     partial_num_files += consts["batch_size"]
                     if partial_num_files // print_size == 1 and idx_batch < num_batches:
-                        print (idx_batch + 1, "/" , num_batches, "batches have been processed,", \
+                        logging.info (idx_batch + 1, "/" , num_batches, "batches have been processed,", \
                                 "average cost until now:", "cost =", total_error / used_batch, ",", \
                                 "cost_c =", error_c / used_batch, ",", \
                                 "time:", time.time() - partial_start)
                         partial_num_files = 0
                         if not options["is_debugging"]:
-                            print("save model... ",)
+                            logging.info("save model... ",)
                             save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
-                            print("finished")
+                            logging.info("finished")
                         num_partial += 1
-                print ("in this epoch, total average cost =", total_error / used_batch, ",", \
+                logging.info ("in this epoch, total average cost =", total_error / used_batch, ",", \
                         "cost_c =", error_c / used_batch, ",",\
                         "time:", time.time() - epoch_start)
                 
@@ -605,22 +609,22 @@ def run(existing_model_name = None):
                 if last_total_error > total_error or options["is_debugging"]:
                     last_total_error = total_error
                     if not options["is_debugging"]:
-                        print ("save model... ",)
+                        logging.info ("save model... ",)
                         save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
-                        print ("finished")
+                        logging.info ("finished")
                 # else:
-                #     print ("optimization finished")
+                #     logging.info ("optimization finished")
                 #     break
 
-            print ("save final model... "),
+            logging.info ("save final model... "),
             save_model(cfg.cc.MODEL_PATH + model_name + ".final.gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
-            print ("finished")
+            logging.info ("finished")
         else:
-            print ("skip training model")
+            logging.info ("skip training model")
 
         if predict_model:
             predict(model, modules, consts, options)
-    print ("Finished, time:", time.time() - running_start)
+    logging.info ("Finished, time:", time.time() - running_start)
 
 if __name__ == "__main__":
     np.set_printoptions(threshold = np.inf)
