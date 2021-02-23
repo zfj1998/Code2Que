@@ -18,7 +18,7 @@ def load_vocab(src_path, tgt_path):
     vocab_dict = {}
     vocab_list = []
     with open(src_path, 'r') as src:
-        for line in src_path:
+        for line in src:
             words = line.lower().split()
             for word in words:
                 if word not in vocab_dict:
@@ -28,7 +28,7 @@ def load_vocab(src_path, tgt_path):
                     vocab_dict[word] += 1
 
     with open(tgt_path, 'r') as src:
-        for line in src_path:
+        for line in src:
             words = line.lower().split()
             for word in words:
                 if word not in vocab_dict:
