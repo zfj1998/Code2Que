@@ -6,6 +6,7 @@
 1. create directory */so* and put *src-train.txt*, *tgt-train.txt* in it
 2. run *data_prepare.py* in the upper directory of */source_code*
 3. run *main.py* in the upper directory of */source_code*
+> change max_epoch and print_time during training procedure
 ***
 *Code2Que* is an automated web service tool, which can help Stack Overflow users for improving question titles. 
 The full research paper has been accepted by TOSEM, please check our pre-print version on arxiv if your are interested: https://arxiv.org/abs/2005.10157

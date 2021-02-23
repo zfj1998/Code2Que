@@ -108,9 +108,10 @@ def init_modules():
     consts["lr"] = cfg.LR
     consts["beam_size"] = cfg.BEAM_SIZE
 
-    consts["max_epoch"] = 50 if options["is_debugging"] else 30 
+    consts["max_epoch"] = 50 if options["is_debugging"] else 200
     consts["print_time"] = 5
-    consts["save_epoch"] = 10 
+    consts["save_epoch"] = 20
+    consts["golden_truth"] = 10
 
     assert consts["dim_x"] == consts["dim_y"]
     assert consts["beam_size"] >= 1
@@ -597,8 +598,9 @@ def run(existing_model_name = None):
                 print ("in this epoch, total average cost =", total_error / used_batch, ",", \
                         "cost_c =", error_c / used_batch, ",",\
                         "time:", time.time() - epoch_start)
-
-                print_sent_dec(y_pred, y_ext, y_mask, oovs, modules, consts, options, local_batch_size)
+                
+                if (epoch + existing_epoch) % consts["golden_truth"] == 0: #每十个epoch进行一次golden test
+                    print_sent_dec(y_pred, y_ext, y_mask, oovs, modules, consts, options, local_batch_size)
                 
                 if last_total_error > total_error or options["is_debugging"]:
                     last_total_error = total_error
@@ -606,9 +608,9 @@ def run(existing_model_name = None):
                         print ("save model... ",)
                         save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
                         print ("finished")
-                else:
-                    print ("optimization finished")
-                    break
+                # else:
+                #     print ("optimization finished")
+                #     break
 
             print ("save final model... "),
             save_model(cfg.cc.MODEL_PATH + model_name + ".final.gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
