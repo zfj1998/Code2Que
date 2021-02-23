@@ -1,5 +1,7 @@
 # *Code2Que*: A Tool for Improving Question Titles from Mined Code Snippets in Stack Overflow
 ## Usage:
+### Environment
+> python3.8 and pytorch1.4
 ### Training Steps
 1. create directory */so* and put *src-train.txt*, *tgt-train.txt* in it
 2. run *data_prepare.py* in the upper directory of */source_code*
