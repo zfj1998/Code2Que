@@ -197,19 +197,19 @@ def prepare_so_dataset():
     print ("dump dict...")
     pickle.dump([all_dic1, dic, hfw, w2i, i2w, w2w], open(TRAINING_PATH + "dic.pkl", "wb"), protocol = pickle.HIGHEST_PROTOCOL)
 
-    # src_path = "./so-data/src-val.txt"
-    # tgt_path = "./so-data/tgt-val.txt"
-    # print ("valset...")
-    # val_xy_list = load_lines(src_path, tgt_path,  configs)
-    # print ("dump val...")
-    # pickle.dump(val_xy_list, open(VALIDATE_PATH + "./val.pkl", "wb"), protocol = pickle.HIGHEST_PROTOCOL)
+    src_path = "./so-data/src-test-clear.txt"
+    tgt_path = "./so-data/tgt-test-clear.txt"
+    print ("valset...")
+    val_xy_list = load_lines(src_path, tgt_path,  configs)
+    print ("dump val...")
+    pickle.dump(val_xy_list, open(VALIDATE_PATH + "./val.pkl", "wb"), protocol = pickle.HIGHEST_PROTOCOL)
     
-    # src_path = "./so-data/src-test.txt"
-    # tgt_path = "./so-data/tgt-test.txt"
-    # print ("testset...")
-    # test_xy_list = load_lines(src_path, tgt_path,  configs)
-    # print ("dump val...")
-    # pickle.dump(test_xy_list, open(TESTING_PATH + "./val.pkl", "wb"), protocol = pickle.HIGHEST_PROTOCOL)
+    src_path = "./so-data/src-test-clear.txt"
+    tgt_path = "./so-data/tgt-test-clear.txt"
+    print ("testset...")
+    test_xy_list = load_lines(src_path, tgt_path,  configs)
+    print ("dump val...")
+    pickle.dump(test_xy_list, open(TESTING_PATH + "./val.pkl", "wb"), protocol = pickle.HIGHEST_PROTOCOL)
     
 
 if __name__ == "__main__":

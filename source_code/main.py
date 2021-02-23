@@ -108,9 +108,9 @@ def init_modules():
     consts["lr"] = cfg.LR
     consts["beam_size"] = cfg.BEAM_SIZE
 
-    consts["max_epoch"] = 50 if options["is_debugging"] else 200
+    consts["max_epoch"] = 50 if options["is_debugging"] else 50
     consts["print_time"] = 5
-    consts["save_epoch"] = 20
+    consts["save_epoch"] = 10
     consts["golden_truth"] = 10
 
     assert consts["dim_x"] == consts["dim_y"]
