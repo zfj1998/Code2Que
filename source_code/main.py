@@ -508,6 +508,10 @@ def run(existing_model_name = None):
         training_model = True
         predict_model = False
 
+    # 加载模型
+    need_load_model = True
+    existing_model_name = 'cnndm.s2s.gru.gpu0.epoch4.5'
+
     print_basic_info(modules, consts, options)
 
     if training_model:
