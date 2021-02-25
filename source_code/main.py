@@ -112,7 +112,7 @@ def init_modules():
     consts["lr"] = cfg.LR
     consts["beam_size"] = cfg.BEAM_SIZE
 
-    consts["max_epoch"] = 50 if options["is_debugging"] else 50
+    consts["max_epoch"] = 50 if options["is_debugging"] else 150
     consts["print_time"] = 5
     consts["save_epoch"] = 10
     consts["golden_truth"] = 10
@@ -510,7 +510,7 @@ def run(existing_model_name = None):
 
     # 加载模型
     need_load_model = True
-    existing_model_name = 'cnndm.s2s.gru.gpu0.epoch4.5'
+    existing_model_name = 'cnndm.s2s.gru.final.gpu9.epoch4.5'
 
     print_basic_info(modules, consts, options)
 
@@ -532,7 +532,7 @@ def run(existing_model_name = None):
         optimizer = torch.optim.Adagrad(model.parameters(), lr=consts["lr"], initial_accumulator_value=0.1)
         
         model_name = "".join(["cnndm.s2s.", options["cell"]])
-        existing_epoch = 0
+        existing_epoch = 50
         if need_load_model:
             if existing_model_name == None:
                 existing_model_name = "cnndm.s2s.gpu4.epoch7.1"
@@ -597,7 +597,7 @@ def run(existing_model_name = None):
                         partial_num_files = 0
                         if not options["is_debugging"]:
                             logging.info("save model... ",)
-                            save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
+                            save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str((epoch+existing_epoch)//consts['save_epoch']) + "." + str(num_partial), model, optimizer)
                             logging.info("finished")
                         num_partial += 1
                 logging.info ("in this epoch, total average cost = {} cost_c = {} time: {}".format(total_error / used_batch, error_c / used_batch, time.time() - epoch_start))
@@ -609,14 +609,14 @@ def run(existing_model_name = None):
                     last_total_error = total_error
                     if not options["is_debugging"]:
                         logging.info ("save model... ",)
-                        save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
+                        save_model(cfg.cc.MODEL_PATH + model_name + ".gpu" + str(consts["idx_gpu"]) + ".epoch" + str((epoch+existing_epoch)//consts['save_epoch']) + "." + str(num_partial), model, optimizer)
                         logging.info ("finished")
                 # else:
                 #     logging.info ("optimization finished")
                 #     break
 
             logging.info ("save final model... "),
-            save_model(cfg.cc.MODEL_PATH + model_name + ".final.gpu" + str(consts["idx_gpu"]) + ".epoch" + str(epoch // consts["save_epoch"] + existing_epoch) + "." + str(num_partial), model, optimizer)
+            save_model(cfg.cc.MODEL_PATH + model_name + ".final.gpu" + str(consts["idx_gpu"]) + ".epoch" + str((epoch+existing_epoch)//consts['save_epoch']) + "." + str(num_partial), model, optimizer)
             logging.info ("finished")
         else:
             logging.info ("skip training model")
