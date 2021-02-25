@@ -59,7 +59,7 @@ def init_modules():
     options = {}
 
     options["is_debugging"] = False
-    options["is_predicting"] = False 
+    options["is_predicting"] = True 
     options["model_selection"] = False # When options["is_predicting"] = True, true means use validation set for tuning, false is real testing.
 
     options["cuda"] = cfg.CUDA and torch.cuda.is_available()
@@ -510,7 +510,7 @@ def run(existing_model_name = None):
 
     # 加载模型
     need_load_model = True
-    existing_model_name = 'cnndm.s2s.gru.final.gpu9.epoch4.5'
+    existing_model_name = 'cnndm.s2s.gru.gpu9.epoch5.2'
 
     print_basic_info(modules, consts, options)
 
