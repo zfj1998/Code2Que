@@ -510,7 +510,7 @@ def run(existing_model_name = None):
 
     # 加载模型
     need_load_model = False
-    existing_model_name = 'cnndm.s2s.gru.gpu9.epoch5.2'
+    existing_model_name = 'cnndm.s2s.gru.gpu9.epoch15.3'
 
     print_basic_info(modules, consts, options)
 
@@ -534,8 +534,6 @@ def run(existing_model_name = None):
         model_name = "".join(["cnndm.s2s.", options["cell"]])
         existing_epoch = 50
         if need_load_model:
-            if existing_model_name == None:
-                existing_model_name = "cnndm.s2s.gpu4.epoch7.1"
             logging.info (f"loading existed model: {existing_model_name}")
             model, optimizer = load_model(cfg.cc.MODEL_PATH + existing_model_name, model, optimizer)
 
