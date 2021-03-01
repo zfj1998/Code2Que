@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-cudaid = 9
+cudaid = 0
 os.environ["CUDA_VISIBLE_DEVICES"] = str(cudaid)
 
 import sys
@@ -509,7 +509,7 @@ def run(existing_model_name = None):
         predict_model = False
 
     # 加载模型
-    need_load_model = False
+    need_load_model = True
     existing_model_name = 'cnndm.s2s.gru.gpu9.epoch15.3'
 
     print_basic_info(modules, consts, options)
