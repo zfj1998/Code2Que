@@ -9,7 +9,7 @@
 > change **max_epoch** and **existing epoch** during training procedure
 
 ### Evaluation Steps
-1. change **cudaid**, **existing_model_name**, **need_load_model** in `main.py`
+1. change **cudaid**, **is_predicting**, **existing_model_name**, **need_load_model** in `main.py`
 2. run `main.py` and then checkout the result in `so/result/beam_summarys`
 ***
 *Code2Que* is an automated web service tool, which can help Stack Overflow users for improving question titles. 
@@ -17,7 +17,7 @@ The full research paper has been accepted by TOSEM, please check our pre-print v
 
 *Code2Que* can be accessed at (new domain!):  
 http://www.code2que.com/  
-http://13.210.12.204:8080. 
+http://13.210.12.204:8080
 
 
 A demo video of *Code2Que* is at:  
