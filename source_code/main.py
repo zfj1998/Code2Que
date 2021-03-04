@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-cudaid = 0
+cudaid = 9
 os.environ["CUDA_VISIBLE_DEVICES"] = str(cudaid)
 
 import sys
@@ -63,7 +63,7 @@ def init_modules():
     options["model_selection"] = False # When options["is_predicting"] = True, true means use validation set for tuning, false is real testing.
 
     options["cuda"] = cfg.CUDA and torch.cuda.is_available()
-    options["device"] = torch.device("cuda" if  options["cuda"] else "cpu")
+    options["device"] = torch.device('cuda' if  options["cuda"] else "cpu")
     
     #in config.py
     options["cell"] = cfg.CELL
@@ -510,7 +510,7 @@ def run(existing_model_name = None):
 
     # 加载模型
     need_load_model = True
-    existing_model_name = 'cnndm.s2s.gru.gpu9.epoch15.3'
+    existing_model_name = 'cnndm.s2s.gru.gpu9.epoch14.5'
 
     print_basic_info(modules, consts, options)
 

@@ -1,0 +1,6 @@
+logs/
+so-data/
+so/
+*.log
+__pycache__/
+
